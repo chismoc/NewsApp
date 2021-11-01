@@ -18,9 +18,11 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-
+    private static final String TAG = "MainActivity";
+    private ArrayList<NewsArticle> news;
     ActivityMainBinding activityMainBinding;
 
     @Override
@@ -30,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
         activityMainBinding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = activityMainBinding.getRoot();
         setContentView(view);
+        news = new ArrayList<>();
     }
 
     private class GetNews extends AsyncTask<Void, Void, Void> {
@@ -118,43 +121,69 @@ public class MainActivity extends AppCompatActivity {
                             }
                             String tagName = parser.getName();
                             if (tagName.equals("title")) {
-                                title = getContent(parser,"title");
+                                title = getContent(parser, "title");
 
                             } else if (tagName.equals("description")) {
-                                description = getContent(parser,"description");
+                                description = getContent(parser, "description");
 
                             } else if (tagName.equals("link")) {
-                                link = getContent(parser,"link");
+                                link = getContent(parser, "link");
 
                             } else if (tagName.equals("pubdate")) {
-                                date = getContent(parser,"pubdate");
+                                date = getContent(parser, "pubdate");
 
-                            } else {//TODO skip tag
+                            } else {
+                                skipTag(parser);
+
                             }
                         }
+NewsArticle item= new NewsArticle(title,description,date,link);
+                        news.add(item);
 
-                    } else {
-                        //TODO:Skip Tag
-                    }
+                } else{
+                    skipTag(parser);
                 }
             }
-
         }
 
-        //method to get content
-        private String getContent(XmlPullParser parser, String tagName) throws IOException, XmlPullParserException {
-            String content = "";
-            //check if inside opening tag with that tag name
-            //check if inside channel element
-            parser.require(XmlPullParser.START_TAG, null, tagName);
-            //check for text and get that text
-            if (parser.next() == XmlPullParser.TEXT) {
+    }
+
+    //method to get content
+    private String getContent(XmlPullParser parser, String tagName) throws IOException, XmlPullParserException {
+        String content = "";
+        //check if inside opening tag with that tag name
+        //check if inside channel element
+        parser.require(XmlPullParser.START_TAG, null, tagName);
+        //check for text and get that text
+        if (parser.next() == XmlPullParser.TEXT) {
 //return the content of tag
-                content = parser.getText();
-                //move parser to nest element
-                parser.next();
+            content = parser.getText();
+            //move parser to nest element
+            parser.next();
+        }
+        return content;
+    }
+
+    //method to skip a tag
+    private void skipTag(XmlPullParser parser) throws XmlPullParserException, IOException {
+        //check if inside opening tag
+        if (parser.getEventType() != XmlPullParser.START_TAG) {
+//if item is not opening tag , wrong item
+            throw new IllegalStateException();
+        }
+        int number = 1;
+        while (number != 0) {
+            switch (parser.next()) {
+                case XmlPullParser.START_TAG:
+                    number++;
+                    break;
+                case XmlPullParser.END_TAG:
+                    number--;
+                    break;
+                default:
+                    break;
             }
-            return content;
         }
     }
+}
 }
