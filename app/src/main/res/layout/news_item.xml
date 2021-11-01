@@ -22,9 +22,10 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/content_textView"
+            android:id="@+id/description_textView"
             android:layout_below="@id/title_textView"
             android:text="Description"
+            android:layout_marginTop="8dp"
             />
         <TextView
             android:layout_width="wrap_content"
@@ -32,7 +33,7 @@
             android:id="@+id/date_textView"
             android:text="date"
            android:layout_alignParentEnd="true"
-            android:layout_below="@id/content_textView"
+            android:layout_below="@id/description_textView"
             android:layout_marginTop="8dp"/>
 
     </RelativeLayout>

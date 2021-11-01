@@ -1,6 +1,8 @@
 package com.example.android.newsapp;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -22,17 +24,24 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
+   private RecyclerView recyclerView;
     private ArrayList<NewsArticle> news;
-    ActivityMainBinding activityMainBinding;
+    private NewsAdapter adapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-        activityMainBinding = ActivityMainBinding.inflate(getLayoutInflater());
-        View view = activityMainBinding.getRoot();
-        setContentView(view);
         news = new ArrayList<>();
+        recyclerView = findViewById(R.id.recyclerView
+        );
+        adapter = new NewsAdapter(this);
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        new GetNews().execute();
     }
 
     private class GetNews extends AsyncTask<Void, Void, Void> {
@@ -56,6 +65,11 @@ public class MainActivity extends AppCompatActivity {
             return null;
         }
 
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            adapter.setNews(news);
+        }
 
         private InputStream getInputStream() {
             //incase something goes wrong ie no internet connection
@@ -129,8 +143,8 @@ public class MainActivity extends AppCompatActivity {
                             } else if (tagName.equals("link")) {
                                 link = getContent(parser, "link");
 
-                            } else if (tagName.equals("pubdate")) {
-                                date = getContent(parser, "pubdate");
+                            } else if (tagName.equals("pubDate")) {
+                                date = getContent(parser, "pubDate");
 
                             } else {
                                 skipTag(parser);
