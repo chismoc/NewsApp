@@ -33,7 +33,7 @@ public class WebsiteActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (webView.canGoBack()) {
-            getObbDir();
+            webView.canGoBack();
         } else {
             super.onBackPressed();
         }
